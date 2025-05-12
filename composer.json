@@ -1,0 +1,21 @@
+{
+    "name": "fuganholi/mercos-integration",
+    "description": "Biblioteca base para comunicação com a API Mercos",
+    "type": "library",
+    "license": "MIT",
+    "authors": [
+        {
+            "name": "Diego Almeida",
+            "email": "diego.feres82@gmail.com"
+        }
+    ],
+    "autoload": {
+        "psr-4": {
+            "Fuganholi\\MercosIntegration\\": "src/"
+        }
+    },
+    "minimum-stability": "stable",
+    "require": {
+        "php": "^8.1"
+    }
+}
