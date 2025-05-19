@@ -10,11 +10,11 @@ class ApiConfig
     public const SANDBOX_ENVIRONMENT = 'sandbox';
 
     public function __construct(
-        public string $environment,
+        public string $environment = '',
         public string $applicationToken = '',
         public string $companyToken = ''
     ) {
-        $this->validEnvironment($this->environment);
+        if ($this->environment) $this->validEnvironment($this->environment);
     }
 
     private function validEnvironment(string $environment): void
