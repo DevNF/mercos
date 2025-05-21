@@ -86,6 +86,13 @@ class Thrower
 
             $message .= $erros;
         }
+
+        if (isset($body->limite_de_requisicoes)) {
+            $limite = $body->limite_de_requisicoes;
+            $espera = $body?->tempo_ate_permitir_novamente ?? 5;
+
+            $message .= "\r\nError: Limite de $limite requisições atingido, aguarde $espera segundos e tente novamente";
+        }
     }
 
     private static function setValidationErrorsMessages(string &$message): void
