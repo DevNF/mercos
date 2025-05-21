@@ -5,9 +5,12 @@ namespace Fuganholi\MercosIntegration\Http;
 use Fuganholi\MercosIntegration\Dto\HttpResponse;
 use Fuganholi\MercosIntegration\Dto\HttpParamCollection;
 use Fuganholi\MercosIntegration\Helpers\Formatter;
+use Fuganholi\MercosIntegration\Traits\Throttleable;
 
 abstract class Client
 {
+    use Throttleable;
+
     private bool $activeDebug = false;
     private bool $isUpload = false;
 
@@ -74,9 +77,10 @@ abstract class Client
         return $this->execute($this->getFullUrl($path), [], $opts, $params);
     }
 
-    private function execute(string $url, array $data = [], array $opts = [], HttpParamCollection $params = new HttpParamCollection()): HttpResponse
+    private function execute(string $baseUrl, array $data = [], array $opts = [], HttpParamCollection $params = new HttpParamCollection()): HttpResponse
     {
         $curlC = curl_init();
+        $url = $baseUrl;
 
         $opts[CURLOPT_HTTPHEADER] = $this->getDefaultHeaders();
 
@@ -85,8 +89,11 @@ abstract class Client
         if (!empty($params)) $url .= ('?' . Formatter::formatHttpParams($params));
 
         if (!empty($data)) {
-            $data = ($this->isUpload) ? Formatter::convertToFormData($data) :json_encode($data);
-            curl_setopt($curlC, CURLOPT_POSTFIELDS, $data);
+            curl_setopt(
+                $curlC,
+                CURLOPT_POSTFIELDS,
+                $this->isUpload ? Formatter::convertToFormData($data) :json_encode($data)
+            );
         };
 
         curl_setopt($curlC, CURLOPT_URL, $url);
@@ -114,6 +121,9 @@ abstract class Client
         curl_close($curlC);
 
         $response = new HttpResponse($response, curl_getinfo($curlC, CURLINFO_HTTP_CODE), $headers, $details);
+
+        if ($response->getStatusCode() === 429)
+            return $this->throttlingRequest($response, 'execute', $baseUrl, $data, $opts, $params);
 
         return $response;
     }
