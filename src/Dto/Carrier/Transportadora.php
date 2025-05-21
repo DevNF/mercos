@@ -48,7 +48,7 @@ class Transportadora extends Validable
         return $this->telefones;
     }
 
-    public static function create(\stdClass $c): Transportadora
+    public static function create(\stdClass $c): static
     {
         $carrier = new self(
             $c->id,
