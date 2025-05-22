@@ -9,11 +9,12 @@ use Fuganholi\MercosIntegration\Traits\CategoryEntity;
 use Fuganholi\MercosIntegration\Traits\CustomerEntity;
 use Fuganholi\MercosIntegration\Traits\OrderEntity;
 use Fuganholi\MercosIntegration\Traits\ProductEntity;
+use Fuganholi\MercosIntegration\Traits\StockEntity;
 use Fuganholi\MercosIntegration\Traits\UserEntity;
 
 class Api extends Client
 {
-    use CategoryEntity, UserEntity, CarrierEntity, CustomerEntity, ProductEntity, OrderEntity;
+    use CategoryEntity, UserEntity, CarrierEntity, CustomerEntity, ProductEntity, StockEntity, OrderEntity;
 
     private static $API_URL = [
         ApiConfig::PRODUCTION_ENVIRONMENT => 'https://app.mercos.com/api',
