@@ -13,7 +13,7 @@ trait StockEntity
     use HttpClientMethods;
 
     const STOCK_ENTITY = '/v1/ajustar_estoque';
-    const BATCH_STOCK_ENTITY = '/v1/ajustar_estoque';
+    const BATCH_STOCK_ENTITY = '/v1/ajustar_estoque_em_lote';
 
     public function adjustStock(Estoque $data): void
     {
