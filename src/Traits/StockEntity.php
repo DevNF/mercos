@@ -33,7 +33,7 @@ trait StockEntity
 
         $data = $data->toArray();
 
-        $response = $this->put(self::BATCH_STOCK_ENTITY, $data['estoques']);
+        $response = $this->post(self::BATCH_STOCK_ENTITY, $data['estoques']);
 
         if (!$response->isSuccess()) {
             Thrower::withHttpResponse($response)
