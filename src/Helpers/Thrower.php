@@ -79,7 +79,12 @@ class Thrower
 
         if (isset($body->erros) && !empty($body->erros)) {
             $erros = array_map(function ($erro) {
-                return $erro->campo . ': ' . $erro->mensagem;
+                if (is_object($erro))
+                    return $erro->campo . ': ' . $erro->mensagem;
+
+                if (is_string($erro)) return $erro;
+
+                return json_encode($erro);
             }, $body->erros);
 
             $erros = "\r\n" . implode("\r\n", $erros);
