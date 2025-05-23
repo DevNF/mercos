@@ -31,7 +31,9 @@ trait StockEntity
     {
         $data->validate();
 
-        $response = $this->put(self::BATCH_STOCK_ENTITY, $data->toArray());
+        $data = $data->toArray();
+
+        $response = $this->put(self::BATCH_STOCK_ENTITY, $data['estoques']);
 
         if (!$response->isSuccess()) {
             Thrower::withHttpResponse($response)
