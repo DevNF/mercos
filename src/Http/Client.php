@@ -5,11 +5,12 @@ namespace Fuganholi\MercosIntegration\Http;
 use Fuganholi\MercosIntegration\Dto\HttpResponse;
 use Fuganholi\MercosIntegration\Dto\HttpParamCollection;
 use Fuganholi\MercosIntegration\Helpers\Formatter;
-use Fuganholi\MercosIntegration\Traits\Throttleable;
+use Fuganholi\MercosIntegration\Traits\Http\Paginable;
+use Fuganholi\MercosIntegration\Traits\Http\Throttleable;
 
 abstract class Client
 {
-    use Throttleable;
+    use Throttleable, Paginable;
 
     private bool $activeDebug = false;
     private bool $isUpload = false;
@@ -39,48 +40,54 @@ abstract class Client
 
     protected function get(string $path, HttpParamCollection $params = new HttpParamCollection()): HttpResponse
     {
-        return $this->execute($this->getFullUrl($path), [], [], $params);
+        $response = $this->execute($path, [], [], $params);
+
+        if ($response->getHeaders('MEUSPEDIDOS_LIMITOU_REGISTROS') == 1) {
+            return $this->fetchAllPages($response, $path, $params);
+        }
+
+        return $response;
     }
 
     protected function post(string $path, array $data, HttpParamCollection $params = new HttpParamCollection()): HttpResponse
     {
         $opts = [CURLOPT_POST => true];
 
-        return $this->execute($this->getFullUrl($path), $data, $opts, $params);
+        return $this->execute($path, $data, $opts, $params);
     }
 
     protected function put(string $path, array $data, HttpParamCollection $params = new HttpParamCollection()): HttpResponse
     {
         $opts = [CURLOPT_CUSTOMREQUEST => 'PUT'];
 
-        return $this->execute($this->getFullUrl($path), $data, $opts, $params);
+        return $this->execute($path, $data, $opts, $params);
     }
 
     protected function patch(string $path, array $data, HttpParamCollection $params = new HttpParamCollection()): HttpResponse
     {
         $opts = [CURLOPT_CUSTOMREQUEST => 'PATCH'];
 
-        return $this->execute($this->getFullUrl($path), $data, $opts, $params);
+        return $this->execute($path, $data, $opts, $params);
     }
 
     protected function delete(string $path, HttpParamCollection $params = new HttpParamCollection()): HttpResponse
     {
         $opts = [CURLOPT_CUSTOMREQUEST => 'DELETE'];
 
-        return $this->execute($this->getFullUrl($path), [], $opts, $params);
+        return $this->execute($path, [], $opts, $params);
     }
 
     protected function options(string $path, HttpParamCollection $params = new HttpParamCollection()): HttpResponse
     {
         $opts = [CURLOPT_CUSTOMREQUEST => 'OPTIONS'];
 
-        return $this->execute($this->getFullUrl($path), [], $opts, $params);
+        return $this->execute($path, [], $opts, $params);
     }
 
-    private function execute(string $baseUrl, array $data = [], array $opts = [], HttpParamCollection $params = new HttpParamCollection()): HttpResponse
+    private function execute(string $path, array $data = [], array $opts = [], HttpParamCollection $params = new HttpParamCollection()): HttpResponse
     {
         $curlC = curl_init();
-        $url = $baseUrl;
+        $url = $this->getFullUrl($path);
 
         $opts[CURLOPT_HTTPHEADER] = $this->getDefaultHeaders();
 
@@ -123,7 +130,9 @@ abstract class Client
         $response = new HttpResponse($response, curl_getinfo($curlC, CURLINFO_HTTP_CODE), $headers, $details);
 
         if ($response->getStatusCode() === 429)
-            return $this->throttlingRequest($response, 'execute', $baseUrl, $data, $opts, $params);
+            return $this->throttlingRequest($response, 'execute', $path, $data, $opts, $params);
+
+        $this->resetThrottleOffset();
 
         return $response;
     }

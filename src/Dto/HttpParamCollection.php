@@ -28,4 +28,16 @@ final class HttpParamCollection
     {
         return $this->params;
     }
+
+    public function setParam(HttpParam $newParam)
+    {
+        foreach ($this->params as $key => $param) {
+            if ($param->name == $newParam->name) {
+                $this->params[$key] = $newParam;
+                return;
+            }
+        }
+
+        $this->params[] = $newParam;
+    }
 }

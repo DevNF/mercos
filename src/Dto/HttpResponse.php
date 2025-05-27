@@ -49,4 +49,19 @@ class HttpResponse
     {
         return ($this->code >= 200 && $this->code <= 299);
     }
+
+    public function getLastUpdate(): string
+    {
+        $objects = $this->getResponseJson();
+
+        if (!is_array($objects) || empty($objects)) return '';
+
+        usort($objects, function ($before, $current) {
+            if ($before->ultima_alteracao == $current->ultima_alteracao) return 0;
+
+            return $before->ultima_alteracao < $current->ultima_alteracao ? 1 : -1;
+        });
+
+        return $objects[0]->ultima_alteracao;
+    }
 }
