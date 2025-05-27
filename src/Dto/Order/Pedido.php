@@ -11,8 +11,9 @@ class Pedido extends Validable
     const STATUS_ORDER = '2';
 
     protected static array $casts = [
-        'dataEmissao' => 'date:Y-m-d H:i:s',
-        'dataCriacao' => 'date:Y-m-d H:i:s'
+        'data_emissao'      => 'date:Y-m-d H:i:s',
+        'data_criacao'      => 'date:Y-m-d H:i:s',
+        'ultima_alteracao'  => 'date:Y-m-d H:i:s'
     ];
 
     protected array $fieldsRules = [];
