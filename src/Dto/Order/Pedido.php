@@ -2,12 +2,14 @@
 
 namespace Fuganholi\MercosIntegration\Dto\Order;
 
-use Fuganholi\MercosIntegration\Dto\HttpResponse;
 use Fuganholi\MercosIntegration\Dto\Validable;
-use Fuganholi\MercosIntegration\Helpers\Formatter;
 
 class Pedido extends Validable
 {
+    const STATUS_CANCELED = '0';
+    const STATUS_BUDGET = '1';
+    const STATUS_ORDER = '2';
+
     protected static array $casts = [
         'dataEmissao' => 'date:Y-m-d H:i:s',
         'dataCriacao' => 'date:Y-m-d H:i:s'
@@ -29,6 +31,7 @@ class Pedido extends Validable
     public function __construct(
         public ?int $id = null,
         public ?int $cliente_id = null,
+        public ?int $pedido_origem_id = null,
         public ?string $cliente_razao_social = null,
         public ?string $cliente_nome_fantasia = null,
         public ?string $cliente_cnpj = null,
@@ -69,6 +72,7 @@ class Pedido extends Validable
         public ?float $percentual_total_comissao_pedido = null,
         public ?string $cupom_de_desconto = null,
         public ?EnderecoEntrega $endereco_entrega = null,
+        public ?\DateTime $ultima_alteracao = null,
     ) {
         //
     }
