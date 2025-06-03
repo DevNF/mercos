@@ -156,4 +156,22 @@ class Pedido extends Validable
     {
         return $this->extra;
     }
+
+    public function getSubtotal(): float
+    {
+        return array_reduce($this->itens, function ($subtotal, $item) {
+            $subtotal += $item->getTotalSemDesconto();
+
+            return $subtotal;
+        }, 0.0);
+    }
+
+    public function getDesconto(): float
+    {
+        return array_reduce($this->itens, function ($desconto, $item) {
+            $desconto += $item->getTotalDesconto();
+
+            return $desconto;
+        }, 0.0);
+    }
 }

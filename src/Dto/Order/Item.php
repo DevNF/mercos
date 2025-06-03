@@ -7,8 +7,6 @@ use Fuganholi\MercosIntegration\Dto\Serializable;
 class Item extends Serializable
 {
     /** @var float[] */
-    protected array $descontos = [];
-    /** @var float[] */
     protected array $descontos_do_vendedor = [];
     /** @var DescontoPromocao[] */
     protected array $descontos_de_promocoes = [];
@@ -23,7 +21,6 @@ class Item extends Serializable
         public ?int $tabela_preco_id = null,
         public ?float $quantidade = null,
         public ?float $preco_tabela = null,
-        public ?float $preco_bruto = null,
         public ?float $preco_liquido = null,
         public ?float $cotacao_moeda = null,
         public ?float $desconto_de_cupom = null,
@@ -43,17 +40,11 @@ class Item extends Serializable
     {
         $item = parent::create($i);
 
-        foreach ($i->descontos as $desconto) $item->addDesconto($desconto);
-        foreach ($i->descontos_do_vendedor as $desconto) $item->addDescontoDoVendedor($desconto);
-        foreach ($i->descontos_de_promocoes as $desconto) $item->addDescontoDePromocao(DescontoPromocao::create($desconto));
-        foreach ($i->descontos_de_politicas as $desconto) $item->addDescontoDePolitica(DescontoPolitica::create($desconto));
+        foreach (($i?->descontos_do_vendedor ?? []) as $desconto) $item->addDescontoDoVendedor($desconto);
+        foreach (($i?->descontos_de_promocoes ?? []) as $desconto) $item->addDescontoDePromocao(DescontoPromocao::create($desconto));
+        foreach (($i?->descontos_de_politicas ?? []) as $desconto) $item->addDescontoDePolitica(DescontoPolitica::create($desconto));
 
         return $item;
-    }
-
-    public function addDesconto(float $desconto): void
-    {
-        $this->descontos[] = $desconto;
     }
 
     public function addDescontoDoVendedor(float $desconto): void
@@ -69,14 +60,6 @@ class Item extends Serializable
     public function addDescontoDePolitica(DescontoPolitica $desconto): void
     {
         $this->descontos_de_politicas[] = $desconto;
-    }
-
-    /**
-     * @return float[]
-     */
-    public function getDescontos(): array
-    {
-        return $this->descontos;
     }
 
     /**
@@ -103,8 +86,18 @@ class Item extends Serializable
         return $this->descontos_de_politicas;
     }
 
+    public function getTotalSemDesconto(): float
+    {
+        return $this->preco_tabela * $this->quantidade;
+    }
+
+    public function getTotalComDesconto(): float
+    {
+        return $this->preco_liquido * $this->quantidade;
+    }
+
     public function getTotalDesconto(): float
     {
-        return $this->preco_bruto - $this->preco_liquido;
+        return $this->preco_tabela - $this->preco_liquido;
     }
 }

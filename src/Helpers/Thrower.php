@@ -79,8 +79,15 @@ class Thrower
 
         if (isset($body->erros) && !empty($body->erros)) {
             $erros = array_map(function ($erro) {
-                if (is_object($erro))
-                    return $erro->campo . ': ' . $erro->mensagem;
+                if (is_object($erro)) {
+                    $message = '';
+
+                    if (isset($erro->campo)) $message .= $erro->campo . ': ';
+
+                    $message .= isset($erro->mensagem) ? $erro->mensagem : json_encode($erro);
+
+                    return $message;
+                }
 
                 if (is_string($erro)) return $erro;
 
