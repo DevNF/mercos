@@ -105,6 +105,10 @@ class Thrower
 
             $message .= "\r\nError: Limite de $limite requisições atingido, aguarde $espera segundos e tente novamente";
         }
+
+        if (!isset($body->mensagem) && !isset($body->erros) && !isset($body->limite_de_requisicoes)) {
+            $message .= "\r\nError: " . json_encode($body);
+        }
     }
 
     private static function setValidationErrorsMessages(string &$message): void
