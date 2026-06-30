@@ -56,6 +56,28 @@ trait ProductEntity
         return $response->getHeaders('meuspedidosid');
     }
 
+    /**
+     * Cria um produto e devolve o corpo da resposta (id do agregador + ids/códigos
+     * dos produtos grade na mesma ordem enviada). Use para produtos grade.
+     */
+    public function createProductWithGrade(Produto $data): Produto|null
+    {
+        $data->validate();
+
+        $response = $this->post(self::PRODUCT_ENTITY, $data->toArray());
+
+        if (!$response->isSuccess()) {
+            Thrower::withHttpResponse($response)
+                ->throwException(CreateProductException::class, 'An error occured when trying to create the product!');
+        }
+
+        $body = $response->getResponseJson();
+
+        if (!is_object($body)) return null;
+
+        return Produto::create($body);
+    }
+
     public function updateProduct(int $productId, Produto $data): void
     {
         $data->validate();
@@ -66,5 +88,27 @@ trait ProductEntity
             Thrower::withHttpResponse($response)
                 ->throwException(UpdateProductException::class, 'An error occured when trying to update the product!');
         }
+    }
+
+    /**
+     * Atualiza um produto e devolve o corpo da resposta (id do agregador + ids/códigos
+     * dos produtos grade na mesma ordem enviada). Use para produtos grade.
+     */
+    public function updateProductWithGrade(int $productId, Produto $data): Produto|null
+    {
+        $data->validate();
+
+        $response = $this->put(self::PRODUCT_ENTITY . "/$productId", $data->toArray());
+
+        if (!$response->isSuccess()) {
+            Thrower::withHttpResponse($response)
+                ->throwException(UpdateProductException::class, 'An error occured when trying to update the product!');
+        }
+
+        $body = $response->getResponseJson();
+
+        if (!is_object($body)) return null;
+
+        return Produto::create($body);
     }
 }
