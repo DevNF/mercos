@@ -21,6 +21,9 @@ class Produto extends Validable
         'observacoes' => 'nullable|max:5000'
     ];
 
+    /** @var ProdutoGrade[] */
+    protected array $produtos_grade = [];
+
     public function __construct(
         public ?int $id = null,
         public ?string $codigo = null,
@@ -50,5 +53,43 @@ class Produto extends Validable
         public ?\DateTime $ultima_alteracao = null
     ) {
         //
+    }
+
+    public static function create(\stdClass $p): static
+    {
+        $produto = parent::create($p);
+
+        foreach (($p?->produtos_grade ?? []) as $grade) {
+            $produto->addProdutoGrade(ProdutoGrade::create($grade));
+        }
+
+        return $produto;
+    }
+
+    public function addProdutoGrade(ProdutoGrade $grade): void
+    {
+        $this->produtos_grade[] = $grade;
+    }
+
+    /**
+     * @return ProdutoGrade[]
+     */
+    public function getProdutosGrade(): array
+    {
+        return $this->produtos_grade;
+    }
+
+    public function hasGrade(): bool
+    {
+        return !empty($this->produtos_grade);
+    }
+
+    public function toArray(): array
+    {
+        $serialized = parent::toArray();
+
+        if (empty($serialized['produtos_grade'])) unset($serialized['produtos_grade']);
+
+        return $serialized;
     }
 }
