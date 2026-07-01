@@ -6,6 +6,9 @@ use Fuganholi\MercosIntegration\Dto\Serializable;
 
 class ItemVariacao extends Serializable
 {
+    // Mercos API rejects 'ordem' in itens_variacao items (only valid on the variation itself).
+    protected array $hidden = ['ordem'];
+
     public function __construct(
         public ?int $id = null,
         public ?string $nome = null,
