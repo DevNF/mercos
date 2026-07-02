@@ -50,6 +50,7 @@ class Produto extends Validable
         public ?bool $peso_dimensoes_unitario = null,
         public ?bool $exibir_no_b2b = null,
         public ?bool $precos_especificos = null,
+        public ?int $produto_agregador_id = null,
         public ?\DateTime $ultima_alteracao = null
     ) {
         //
