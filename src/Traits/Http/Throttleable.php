@@ -6,7 +6,7 @@ use Fuganholi\MercosIntegration\Dto\HttpResponse;
 
 trait Throttleable
 {
-    private int $throttleLimit = 3;
+    private int $throttleLimit = 8;
     private int $throttleOffset = 0;
 
     public function throttlingRequest(HttpResponse $httpResponse, string $method, ...$args)
