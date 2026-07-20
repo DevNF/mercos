@@ -37,7 +37,12 @@ class HttpResponse
     {
         if (!$key) return $this->headers;
 
-        return $this->headers[$key] ?? null;
+        // HTTP/2 normaliza nomes de header para minúsculo; busca case-insensitive
+        // evita que headers como MEUSPEDIDOS_LIMITOU_REGISTROS deixem de ser vistos,
+        // quebrando a paginação automática (fetchAllPages nunca era acionado).
+        $normalized = array_change_key_case($this->headers, CASE_LOWER);
+
+        return $normalized[strtolower($key)] ?? null;
     }
 
     public function getRequestDetails(): mixed
